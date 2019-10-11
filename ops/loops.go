@@ -1,4 +1,4 @@
-package main
+package ops
 
 import (
 	"context"
@@ -11,6 +11,8 @@ import (
 	"github.com/luno/jettison/j"
 	"github.com/luno/jettison/log"
 	"github.com/luno/reflex"
+
+	"github.com/uht-hack/unsure/state"
 )
 
 var (
@@ -19,12 +21,12 @@ var (
 	players = flag.Int("players", 4, "number of players in the team")
 )
 
-func StartLoops(s *State) {
+func StartLoops(s *state.State) {
 	go startMatchForever(s)
 	go logHeadForever(s)
 }
 
-func logHeadForever(s *State) {
+func logHeadForever(s *state.State) {
 	var delay time.Duration
 	for {
 		time.Sleep(delay)
@@ -49,7 +51,7 @@ func logHeadForever(s *State) {
 	}
 }
 
-func startMatchForever(s *State) {
+func startMatchForever(s *state.State) {
 	for {
 		ctx := unsure.ContextWithFate(context.Background(), unsure.DefaultFateP())
 

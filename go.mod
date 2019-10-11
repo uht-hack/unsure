@@ -1,4 +1,4 @@
-module github.com/corverroos/play
+module github.com/uht-hack/unsure
 
 go 1.12
 
