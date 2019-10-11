@@ -105,6 +105,18 @@ func (rs RoundState) Included(player string)  bool {
 	return false
 }
 
+func (rs RoundState) Submitted(player string)  bool {
+	for _, p := range rs.Players {
+		if p.Name != player {
+			continue
+		}
+
+		return p.Submitted
+	}
+
+	return false
+}
+
 func (rs RoundState) GetSubmitOrder() []RoundPlayerState {
 	var res []RoundPlayerState
 	for _, m := range rs.Players {
@@ -119,6 +131,22 @@ func (rs RoundState) GetSubmitOrder() []RoundPlayerState {
 	})
 
 	return res
+}
+
+func (rs RoundState) CanSubmit(player string) bool {
+	var res []RoundPlayerState
+	for _, m := range rs.Players {
+		if !m.Included || m.Submitted{
+			continue
+		}
+		res = append(res, m)
+	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return res[i].Rank < res[j].Rank
+	})
+
+	return res[0].Name == player
 }
 
 func (rs RoundState) GetTotal(player string) int32 {

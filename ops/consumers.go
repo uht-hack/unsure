@@ -76,6 +76,13 @@ func ConsumePlayerEvents(dbc *sql.DB, uhtClient unsure.UhtClient, isOwnEvents bo
 			}
 			err = AddPlayerState(ctx,dbc,*roundData,id)
 			return err
+
+
+		}
+
+		if reflex.IsAnyType(e.Type, rounds.RoundStatusSubmit) {
+			// Try submit
+			return AttemptSubmit(ctx, dbc, e.ForeignID)
 		}
 
 		return nil
