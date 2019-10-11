@@ -2,6 +2,7 @@ package matches
 
 import (
 	"github.com/luno/shift"
+	"github.com/uht-hack/unsure/db/events"
 )
 
 //go:generate shiftgen -inserter=startReq -updaters=endReq -table=matches
@@ -10,7 +11,7 @@ import (
 // New --> Started |
 //                 L --> Failed
 
-var fsm = shift.NewFSM(events).
+var fsm = shift.NewFSM(events.GetTable()).
 	Insert(MatchStatusStarted, startReq{}, MatchStatusEnded).
 	Update(MatchStatusEnded, endReq{}).
 	Build()
