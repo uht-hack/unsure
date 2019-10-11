@@ -93,6 +93,14 @@ func (rs RoundState) GetPlayer(player string) (int, RoundPlayerState, bool) {
 	return 0, RoundPlayerState{}, false
 }
 
+func (rs RoundState) UpdatePlayerState(player string, newState RoundPlayerState) {
+	for i, m := range rs.Players {
+		if m.Name == player {
+			rs.Players[i] = newState
+		}
+	}
+}
+
 func (rs RoundState) Included(player string)  bool {
 	for _, p := range rs.Players {
 		if p.Name != player {
@@ -184,6 +192,13 @@ func ToCollected(ctx context.Context, dbc *sql.DB, id int64, from RoundStatus,
 	prevUpdatedAt time.Time, newState RoundState) error {
 
 	return to(ctx, dbc, id, from, RoundStatusCollected, prevUpdatedAt,
+		joinedReq{ID: id, State: newState})
+}
+
+func ToSubmitted(ctx context.Context, dbc *sql.DB, id int64, from RoundStatus,
+	prevUpdatedAt time.Time, newState RoundState) error {
+
+	return to(ctx, dbc, id, from, RoundStatusSubmitted, prevUpdatedAt,
 		joinedReq{ID: id, State: newState})
 }
 

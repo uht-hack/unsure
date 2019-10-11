@@ -49,14 +49,14 @@ const playerEventsConsumer consumerName = "consume_player_update"
 
 func ConsumeAllPlayersForever(s *state.State) {
 	for i := 0; i < 3; i++ {
-		go ConsumePlayerEvents(s.UhtDB().DB,s.UhtClient(i).Stream, false)
+		go ConsumePlayerEvents(s.UhtDB().DB, s.EngineClient(), s.UhtClient(i).Stream, false)
 	}
 
 	// Consume Own Events
-	go ConsumePlayerEvents(s.UhtDB().DB, events.ToStream(s.UhtDB().DB), true)
+	go ConsumePlayerEvents(s.UhtDB().DB, s.EngineClient(), events.ToStream(s.UhtDB().DB), true)
 }
 
-func ConsumePlayerEvents(dbc *sql.DB, stream reflex.StreamFunc, isOwnEvents bool) {
+func ConsumePlayerEvents(dbc *sql.DB, ec engine.Client, stream reflex.StreamFunc, isOwnEvents bool) {
 	f := func(ctx context.Context, fate fate.Fate, e *reflex.Event) error {
 		if reflex.IsAnyType(e.Type, rounds.RoundStatusCollected) {
 			// Do lookup for players' data
@@ -64,7 +64,7 @@ func ConsumePlayerEvents(dbc *sql.DB, stream reflex.StreamFunc, isOwnEvents bool
 
 		if reflex.IsAnyType(e.Type, rounds.RoundStatusSubmit) {
 			// Try submit
-			return AttemptSubmit(ctx, dbc, e.ForeignID)
+			return AttemptSubmit(ctx, dbc, ec, e.ForeignID)
 		}
 
 		return nil

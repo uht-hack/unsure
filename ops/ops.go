@@ -7,9 +7,10 @@ import (
 
 	"github.com/uht-hack/unsure/db/rounds"
 	"github.com/uht-hack/unsure/state"
+	"github.com/corverroos/unsure/engine"
 )
 
-func AttemptSubmit(ctx context.Context, dbc *sql.DB, roundID string) error {
+func AttemptSubmit(ctx context.Context, dbc *sql.DB, ec engine.Client, roundID string) error {
 	rID, err := strconv.Atoi(roundID)
 	if err != nil {
 		return err
@@ -29,10 +30,31 @@ func AttemptSubmit(ctx context.Context, dbc *sql.DB, roundID string) error {
 		return nil
 	}
 
+	total := r.State.GetTotal(*player)
+
 	// Perform the submit
+	err = ec.SubmitRound(ctx,"uht", *player, int64(rID), total)
+	if err != nil {
+		return nil
+	}
 
+	// Move to submitted
+	_, rs, _ := r.State.GetPlayer(*player)
+	r.State.UpdatePlayerState(*player, rounds.RoundPlayerState{
+		Name:      *player,
+		Rank:      playerState.Rank,
+		Parts:     rs.Parts,
+		Included:  rs.Included,
+		Collected: rs.Collected,
+		Submitted: true,
+	})
 
-	// Move to correct status
+	err = rounds.ToSubmitted(ctx, dbc, r.ID, rounds.RoundStatusCollect, r.UpdatedAt, rounds.RoundState{
+		Players: r.State.Players,
+	})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -71,8 +93,7 @@ func CollectRound(ctx context.Context, s *state.State, roundID string) error {
 		parts[p.Name] = int32(p.Part)
 	}
 
-	roundState := make([]rounds.RoundPlayerState, 4)
-	roundState = append(roundState, rounds.RoundPlayerState{
+	r.State.UpdatePlayerState(*player, rounds.RoundPlayerState{
 		Name:      *player,
 		Rank:      playerState.Rank,
 		Parts:     parts,
