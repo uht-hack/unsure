@@ -6,22 +6,22 @@ import (
 	"database/sql"
 )
 
-const cols = " `id`, `status` "
+const cols = " `id`, `status`, `players` "
 const selectPrefix = "select " + cols + " from matches where "
 
-func Lookup(ctx context.Context, dbc dbc, id int64) (*match, error) {
+func Lookup(ctx context.Context, dbc dbc, id int64) (*Match, error) {
 	return lookupWhere(ctx, dbc, "id=?", id)
 }
 
 // lookupWhere queries the matches table with the provided where clause, then scans
 // and returns a single row.
-func lookupWhere(ctx context.Context, dbc dbc, where string, args ...interface{}) (*match, error) {
+func lookupWhere(ctx context.Context, dbc dbc, where string, args ...interface{}) (*Match, error) {
 	return scan(dbc.QueryRowContext(ctx, selectPrefix+where, args...))
 }
 
 // listWhere queries the matches table with the provided where clause, then scans
 // and returns all the rows.
-func listWhere(ctx context.Context, dbc dbc, where string, args ...interface{}) ([]match, error) {
+func listWhere(ctx context.Context, dbc dbc, where string, args ...interface{}) ([]Match, error) {
 
 	rows, err := dbc.QueryContext(ctx, selectPrefix+where, args...)
 	if err != nil {
@@ -29,7 +29,7 @@ func listWhere(ctx context.Context, dbc dbc, where string, args ...interface{}) 
 	}
 	defer rows.Close()
 
-	var res []match
+	var res []Match
 	for rows.Next() {
 		r, err := scan(rows)
 		if err != nil {
@@ -41,17 +41,18 @@ func listWhere(ctx context.Context, dbc dbc, where string, args ...interface{}) 
 	return res, rows.Err()
 }
 
-func scan(row row) (*match, error) {
+func scan(row row) (*Match, error) {
 	var g glean
 
-	err := row.Scan(&g.id, &g.status)
+	err := row.Scan(&g.id, &g.status, &g.players)
 	if err != nil {
 		return nil, err
 	}
 
-	return &match{
-		id:     g.id,
-		status: g.status,
+	return &Match{
+		id:      g.id,
+		status:  g.status,
+		players: g.players,
 	}, nil
 }
 

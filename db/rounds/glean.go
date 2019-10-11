@@ -1,7 +1,10 @@
 package rounds
 
+import "database/sql"
+
 //go:generate glean -table=rounds
 
 type glean struct {
-	round
+	Round
+	Error sql.NullString
 }

@@ -2,6 +2,7 @@ create table `matches`
 (
   id bigint primary key,
   status int
+  players int
 );
 
 create table `match_events`
@@ -16,10 +17,19 @@ create table `match_events`
 
 create table `rounds`
 (
-  id bigint primary key,
-  status int,
-  match_id bigint, -- foreign key
-  data text
+  id bigint not null auto_increment,
+  match_id bigint not null,
+  `index` int not null,
+  status int not null,
+  team varchar(255) not null,
+  state text,
+  error text,
+
+  created_at datetime(3) not null,
+  updated_at datetime(3) not null,
+
+  primary key (id),
+  unique by_team_status (team,`index`)
 );
 
 create table `round_events`
