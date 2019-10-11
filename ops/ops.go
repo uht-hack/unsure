@@ -37,9 +37,9 @@ func CollectRound(ctx context.Context, s *state.State, roundID string) error {
 		return err
 	}
 
-	parts := map[string]int{}
+	parts := map[string]int32{}
 	for _, p := range playerState.Players {
-		parts[p.Name] = p.Part
+		parts[p.Name] = int32(p.Part)
 	}
 
 	roundState := make([]rounds.RoundPlayerState, 4)
