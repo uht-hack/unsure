@@ -2,6 +2,7 @@ package ops
 
 import (
 	"context"
+	"time"
 
 	"github.com/uht-hack/unsure/db/cursors"
 	"github.com/corverroos/unsure/engine"
@@ -12,6 +13,13 @@ import (
 )
 
 const engineEventsConsumer = "engine_updates"
+
+// GetCTX returns a new context.
+// TODO(jonathan): Add crashing functionality into this.
+func GetCTX() context.Context {
+	ctx := context.Background()
+	return ctx
+}
 
 func consumeEngineEventsForever(s *state.State) {
 	f := func(ctx context.Context, fate fate.Fate, e *reflex.Event) error {
@@ -27,5 +35,5 @@ func consumeEngineEventsForever(s *state.State) {
 	consumable := reflex.NewConsumable(s.EngineClient().Stream(context.Background(), "", reflex.WithStreamFromHead()), cursorStore)
 	consumer := reflex.NewConsumer(engineEventsConsumer, f, reflex.WithConsumerActivityTTL(-1))
 
-	rpatterns.ConsumeForever(s.GetLeaderState().WaitUntilLeader, consumable.Consume, consumer)
+	rpatterns.ConsumeForever(GetCTX, consumable.Consume, consumer)
 }
