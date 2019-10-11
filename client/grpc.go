@@ -3,12 +3,14 @@ package client
 import (
 	"context"
 	"github.com/corverroos/unsure"
-	pb "github.com/corverroos/unsure/engine/enginepb"
 	"github.com/luno/reflex"
 	"github.com/luno/reflex/reflexpb"
+	"github.com/uht-hack/unsure/uhtpb"
 	"google.golang.org/grpc"
 
 	uht "github.com/uht-hack/unsure"
+	pb "github.com/uht-hack/unsure/uhtpb"
+
 )
 
 var _ uht.UhtClient = (*client)(nil)
@@ -16,7 +18,7 @@ var _ uht.UhtClient = (*client)(nil)
 type client struct {
 	address   string
 	rpcConn   *grpc.ClientConn
-	rpcClient pb.EngineClient
+	rpcClient pb.UhtClient
 }
 
 func (c *client) Ping(ctx context.Context) error {
@@ -30,6 +32,26 @@ func (c *client) Stream(ctx context.Context, after string, opts ...reflex.Stream
 		return c.rpcClient.Stream(ctx, req)
 	})
 	return sFn(ctx, after, opts...)
+}
+
+func (c *client) RoundData(ctx context.Context, round int64) (*uht.CollectRoundRes, error) {
+	res, err := c.rpcClient.RoundData(ctx, &uhtpb.CollectRoundReq{
+		RoundId: round,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var realPlayers = make([]uht.CollectPlayer, len(res.Players))
+	for i, p := range res.Players {
+		realPlayers[i].Name = p.Name
+		realPlayers[i].Part = int(p.Part)
+	}
+
+	return &uht.CollectRoundRes {
+		Rank: int(res.Rank),
+		Players: realPlayers,
+	}, nil
 }
 
 type option func(*client)
@@ -54,7 +76,7 @@ func New(addr string, opts ...option) (*client, error) {
 		return nil, err
 	}
 
-	c.rpcClient = pb.NewEngineClient(c.rpcConn)
+	c.rpcClient = pb.NewUhtClient(c.rpcConn)
 
 	return &c, nil
 }
