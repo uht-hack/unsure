@@ -6,10 +6,10 @@ windows:
       - commands:
          - go run unsure/engine/engine/main.go --db_recreate --crash_ttl=0 --fate_p=0
       - commands:
-         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_1?" --uht_cl1="127.0.0.1:8001" --uht_cl2="127.0.0.1:8002" --uht_cl3="127.0.0.1:8003"
+         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_1?" --engine_address="127.0.0.1:12048" --uht_cl1="127.0.0.1:18001" --uht_cl2="127.0.0.1:18002" --uht_cl3="127.0.0.1:18003"
       - commands:
-         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_2?" --uht_cl1="127.0.0.1:8002" --uht_cl2="127.0.0.1:8003" --uht_cl3="127.0.0.1:8000"
+         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_2?" --engine_address="127.0.0.1:12048" --uht_cl1="127.0.0.1:18002" --uht_cl2="127.0.0.1:18003" --uht_cl3="127.0.0.1:18000"
       - commands:
-         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_3?" --uht_cl1="127.0.0.1:8003" --uht_cl2="127.0.0.1:8000" --uht_cl3="127.0.0.1:8001"
+         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_3?" --engine_address="127.0.0.1:12048" --uht_cl1="127.0.0.1:18003" --uht_cl2="127.0.0.1:18000" --uht_cl3="127.0.0.1:18001"
       - commands:
-         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_4?" --uht_cl1="127.0.0.1:8000" --uht_cl2="127.0.0.1:8001" --uht_cl3="127.0.0.1:8002"
+         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_4?" --engine_address="127.0.0.1:12048" --uht_cl1="127.0.0.1:18000" --uht_cl2="127.0.0.1:18001" --uht_cl3="127.0.0.1:18002"
