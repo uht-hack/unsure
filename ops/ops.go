@@ -2,10 +2,10 @@ package ops
 
 import (
 	"context"
-	"errors"
+	"strconv"
+
 	"github.com/uht-hack/unsure/db/rounds"
 	"github.com/uht-hack/unsure/state"
-	"strconv"
 )
 
 func CollectRound(ctx context.Context, s *state.State, roundID string) error {
@@ -17,6 +17,11 @@ func CollectRound(ctx context.Context, s *state.State, roundID string) error {
 	r, err := rounds.LookupByIndex(ctx, s.UhtDB().DB, rID)
 	if err != nil {
 		return err
+	}
+
+	// Check if the player is included in the round
+	if !r.State.Included(*player) {
+		return nil
 	}
 
 	// Move to collecting
@@ -32,11 +37,16 @@ func CollectRound(ctx context.Context, s *state.State, roundID string) error {
 		return err
 	}
 
+	parts := map[string]int{}
+	for _, p := range playerState.Players {
+		parts[p.Name] = p.Part
+	}
+
 	roundState := make([]rounds.RoundPlayerState, 4)
 	roundState = append(roundState, rounds.RoundPlayerState{
 		Name:      *player,
 		Rank:      playerState.Rank,
-		Parts:     nil,
+		Parts:     parts,
 		Included:  true,
 		Collected: false,
 		Submitted: false,
@@ -73,14 +83,20 @@ func JoinRound(ctx context.Context, s *state.State, roundID string) error {
 
 	// Ask the engine client to join the round
 	cl := s.EngineClient()
-	ok, err := cl.JoinRound(ctx,"uht", *player, int64(rID))
+	included, err := cl.JoinRound(ctx,"uht", *player, int64(rID))
 	if err != nil {
 		return err
 	}
 
-	if !ok {
-		return errors.New("can't join")
-	}
+	roundState := make([]rounds.RoundPlayerState, 4)
+	roundState = append(roundState, rounds.RoundPlayerState{
+		Name:      *player,
+		Rank:      playerState.Rank,
+		Parts:     nil,
+		Included:  included,
+		Collected: false,
+		Submitted: false,
+	})
 
 	// Move the round into joined state
 	err = rounds.ToJoined(ctx, s.UhtDB().DB, r.ID, rounds.RoundStatusJoin, r.UpdatedAt, rounds.RoundState{})

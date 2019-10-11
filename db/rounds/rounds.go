@@ -93,6 +93,18 @@ func (rs RoundState) GetPlayer(player string) (int, RoundPlayerState, bool) {
 	return 0, RoundPlayerState{}, false
 }
 
+func (rs RoundState) Included(player string)  bool {
+	for _, p := range rs.Players {
+		if p.Name != player {
+			continue
+		}
+
+		return p.Included
+	}
+
+	return false
+}
+
 func (rs RoundState) GetSubmitOrder() []RoundPlayerState {
 	var res []RoundPlayerState
 	for _, m := range rs.Players {
