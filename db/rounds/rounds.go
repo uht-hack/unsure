@@ -121,8 +121,8 @@ func (rs RoundState) GetSubmitOrder() []RoundPlayerState {
 	return res
 }
 
-func (rs RoundState) GetTotal(player string) int {
-	var res int
+func (rs RoundState) GetTotal(player string) int32 {
+	var res int32
 	for _, m := range rs.Players {
 		res += m.Parts[player]
 	}

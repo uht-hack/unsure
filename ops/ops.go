@@ -25,7 +25,7 @@ func CollectRound(ctx context.Context, s *state.State, roundID string) error {
 	}
 
 	// Move to collecting
-	err = rounds.ToCollect(ctx, s.UhtDB().DB, r.ID, rounds.RoundStatusJoined, r.UpdatedAt, rounds.RoundState{})
+	err = rounds.ToCollect(ctx, s.UhtDB().DB, r.ID, rounds.RoundStatusJoined, r.UpdatedAt, r.State)
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func CollectRound(ctx context.Context, s *state.State, roundID string) error {
 	})
 
 	// Move to collected
-	err = rounds.ToCollected(ctx, s.UhtDB().DB, r.ID, rounds.RoundStatusJoin, r.UpdatedAt, rounds.RoundState{
+	err = rounds.ToCollected(ctx, s.UhtDB().DB, r.ID, rounds.RoundStatusCollect, r.UpdatedAt, rounds.RoundState{
 		Players:roundState,
 	})
 	if err != nil {
