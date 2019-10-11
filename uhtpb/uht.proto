@@ -1,0 +1,44 @@
+syntax = "proto3";
+package uhtpb;
+
+import "google/protobuf/timestamp.proto";
+import "github.com/luno/reflex/reflexpb/reflex.proto";
+
+
+enum RoundStatus {
+    ROUND_STATUS_UNKNOWN    = 0;
+	ROUND_STATUS_JOIN       = 1;
+	ROUND_STATUS_JOINED     = 2;
+	ROUND_STATUS_COLLECT    = 3;
+	ROUND_STATUS_COLLECTED  = 4;
+	ROUND_STATUS_SUBMIT     = 5;
+	ROUND_STATUS_SUBMITTED  = 6;
+	ROUND_STATUS_SUCCESS    = 7;
+	ROUND_STATUS_FAILED     = 8;
+	ROUND_STATUS_SENTINEL   = 9;
+}
+
+message Round {
+	int64 id = 1;
+	int64 match_id = 2;
+	int64 index = 3;
+	string team = 4;
+	RoundStatus status = 5;
+	RoundState state = 6;
+	string error = 7;
+	google.protobuf.Timestamp created_at = 8;
+	google.protobuf.Timestamp updated_at = 9;
+}
+
+message RoundState {
+	repeated RoundPlayerState players = 1;
+}
+
+message RoundPlayerState {
+	string name = 1;
+	int32 rank = 2;
+	map<string, int32> parts = 3;
+	bool included = 4;
+	bool collected =5;
+	bool submitted =6;
+}

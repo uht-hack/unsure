@@ -11,15 +11,15 @@ import (
 )
 
 type Round struct {
-	ID        int64
-	MatchID   int64
-	Index     int64
-	Team      string
-	Status    RoundStatus
-	State     RoundState
-	Error     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        int64       `protocp:"1"`
+	MatchID   int64       `protocp:"2"`
+	Index     int64       `protocp:"3"`
+	Team      string      `protocp:"4"`
+	Status    RoundStatus `protocp:"5"`
+	State     RoundState  `protocp:"6"`
+	Error     string      `protocp:"7"`
+	CreatedAt time.Time   `protocp:"8"`
+	UpdatedAt time.Time   `protocp:"9"`
 }
 
 //go:generate stringer -type=RoundStatus -trimprefix=RoundStatus
@@ -54,16 +54,16 @@ const (
 )
 
 type RoundState struct {
-	Players []RoundPlayerState
+	Players []RoundPlayerState `protocp:"1"`
 }
 
 type RoundPlayerState struct {
-	Name      string
-	Rank      int
-	Parts     map[string]int
-	Included  bool
-	Collected bool
-	Submitted bool
+	Name      string         `protocp:"1"`
+	Rank      int            `protocp:"2"`
+	Parts     map[string]int `protocp:"3"`
+	Included  bool           `protocp:"4"`
+	Collected bool           `protocp:"5"`
+	Submitted bool           `protocp:"6"`
 }
 
 func (rs RoundState) Value() (driver.Value, error) {
