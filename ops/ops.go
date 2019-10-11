@@ -2,6 +2,8 @@ package ops
 
 import (
 	"context"
+	"database/sql"
+	"github.com/uht-hack/unsure"
 	"strconv"
 
 	"github.com/uht-hack/unsure/db/rounds"
@@ -25,14 +27,14 @@ func CollectRound(ctx context.Context, s *state.State, roundID string) error {
 	}
 
 	// Move to collecting
-	err = rounds.ToCollect(ctx, s.UhtDB().DB, r.ID, rounds.RoundStatusJoined, r.UpdatedAt, r.State)
+	err = rounds.ToCollect(ctx, s.UhtDB().DB, r.ID, rounds.RoundStatusJoined, r.UpdatedAt, rounds.RoundState{})
 	if err != nil {
 		return err
 	}
 
 	// Get parts from client
 	cl := s.EngineClient()
-	playerState, err = cl.CollectRound(ctx, "uht", player, int64(rID))
+	playerState, err := cl.CollectRound(ctx, "uht", *player, int64(rID))
 	if err != nil {
 		return err
 	}
@@ -103,6 +105,29 @@ func JoinRound(ctx context.Context, s *state.State, roundID string) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func AddPlayerState(ctx context.Context, dbc *sql.DB, rondRes unsure.CollectRoundRes, roundID int) error {
+	r, err := rounds.LookupByIndex(ctx, dbc, roundID)
+	if err != nil {
+		return err
+	}
+	currentPlayerState := r.State.Players[0]
+
+	var resPlayer unsure.CollectPlayer
+	for _,player := range rondRes.Players {
+		if player.Name == currentPlayerState.Name {
+			resPlayer = player
+			break
+		}
+	}
+
+	currentPlayerState.Parts[resPlayer.Name] = currentPlayerState.Parts[resPlayer.Name] + int32(resPlayer.Part)
+
+
+
 
 	return nil
 }
