@@ -24,11 +24,16 @@ func GetCTX() context.Context {
 func consumeEngineEventsForever(s *state.State) {
 	f := func(ctx context.Context, fate fate.Fate, e *reflex.Event) error {
 		// Handle round join events.
-		if !reflex.IsAnyType(e.Type, engine.EventTypeRoundJoin) {
-			return nil
+		if reflex.IsAnyType(e.Type, engine.EventTypeRoundJoin) {
+			return JoinRound(ctx, s, e.ForeignID)
 		}
 
-		return JoinRound(ctx, s, e.ForeignID)
+		// Handle round collect events.
+		if reflex.IsAnyType(e.Type, engine.EventTypeRoundCollect) {
+			return CollectRound(ctx, s, e.ForeignID)
+		}
+
+		return nil
 	}
 
 	cursorStore := cursors.ToStore(s.UhtDB().DB)

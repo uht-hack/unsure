@@ -133,6 +133,20 @@ func ToJoined(ctx context.Context, dbc *sql.DB, id int64, from RoundStatus,
 		joinedReq{ID: id, State: newState})
 }
 
+func ToCollect(ctx context.Context, dbc *sql.DB, id int64, from RoundStatus,
+	prevUpdatedAt time.Time, newState RoundState) error {
+
+	return to(ctx, dbc, id, from, RoundStatusCollect, prevUpdatedAt,
+		joinedReq{ID: id, State: newState})
+}
+
+func ToCollected(ctx context.Context, dbc *sql.DB, id int64, from RoundStatus,
+	prevUpdatedAt time.Time, newState RoundState) error {
+
+	return to(ctx, dbc, id, from, RoundStatusCollected, prevUpdatedAt,
+		joinedReq{ID: id, State: newState})
+}
+
 func ensurePrevUpdatedAt(ctx context.Context, tx *sql.Tx, id int64, updatedAt time.Time) error {
 	var n int
 	err := tx.QueryRowContext(ctx, "select exists (select 1 from rounds "+
