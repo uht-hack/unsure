@@ -7,6 +7,7 @@ import "github.com/luno/reflex/reflexpb/reflex.proto";
 service Uht {
   rpc Ping (Empty) returns (Empty) {}
   rpc Stream (reflexpb.StreamRequest) returns (stream reflexpb.Event) {}
+  rpc RoundData(CollectRoundReq) returns (CollectRoundRes) {}
 }
 
 message Empty {}
@@ -47,4 +48,18 @@ message RoundPlayerState {
 	bool included = 4;
 	bool collected =5;
 	bool submitted =6;
+}
+
+message CollectRoundReq {
+	int64 round_id = 1;
+}
+
+message CollectRoundRes {
+	repeated CollectPlayer players = 1;
+}
+
+message CollectPlayer {
+	string name = 1;
+	map<string, int32> parts = 2;
+	int64 rank = 3;
 }

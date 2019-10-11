@@ -5,6 +5,7 @@ import (
 	"github.com/luno/reflex"
 	"github.com/luno/reflex/reflexpb"
 	"github.com/uht-hack/unsure/db/events"
+	"github.com/uht-hack/unsure/db/rounds"
 	"github.com/uht-hack/unsure/uhtpb"
 )
 
@@ -23,6 +24,26 @@ func (srv *Server) Ping(ctx context.Context, req *uhtpb.Empty) (*uhtpb.Empty, er
 
 func (srv *Server) Stream(req *reflexpb.StreamRequest, ss uhtpb.Uht_StreamServer) error {
 	return srv.rserver.Stream(srv.stream, req, ss)
+}
+
+func (srv *Server) RoundData(ctx context.Context, req *uhtpb.CollectRoundReq) (*uhtpb.CollectRoundRes, error) {
+	round, err := rounds.Lookup(ctx, srv.b.UhtDB().DB, req.RoundId)
+	if err != nil {
+		return nil, err
+	}
+
+	players := make([]*uhtpb.CollectPlayer, len(round.State.Players))
+	for i, p := range round.State.Players {
+		players[i] = &uhtpb.CollectPlayer{
+			Name: p.Name,
+			Rank: int64(p.Rank),
+			Parts: p.Parts,
+		}
+	}
+
+	return &uhtpb.CollectRoundRes{
+		Players: players,
+	}, nil
 }
 
 // New returns a new server instance.

@@ -60,7 +60,7 @@ type RoundState struct {
 type RoundPlayerState struct {
 	Name      string         `protocp:"1"`
 	Rank      int            `protocp:"2"`
-	Parts     map[string]int `protocp:"3"`
+	Parts     map[string]int32 `protocp:"3"`
 	Included  bool           `protocp:"4"`
 	Collected bool           `protocp:"5"`
 	Submitted bool           `protocp:"6"`
