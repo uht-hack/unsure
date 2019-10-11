@@ -15,7 +15,7 @@ import (
 type Round struct {
 	ID        int64       `protocp:"1"`
 	MatchID   int64       `protocp:"2"`
-	Index     int64       `protocp:"3"`
+	Index     int64       `protocp:"3"` // this is the payer id
 	Team      string      `protocp:"4"`
 	Status    RoundStatus `protocp:"5"`
 	State     RoundState  `protocp:"6"`
@@ -115,6 +115,10 @@ func (rs RoundState) GetTotal(player string) int {
 		res += m.Parts[player]
 	}
 	return res
+}
+
+func LookupByIndex(ctx context.Context, dbc *sql.DB,index int) (*Round, error) {
+	return lookupWhere(ctx,dbc,"index=?", index)
 }
 
 func Join(ctx context.Context, dbc *sql.DB, team string, matchID int64, index int) error {
