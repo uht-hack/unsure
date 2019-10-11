@@ -4,9 +4,9 @@ import (
 	"flag"
 	"github.com/corverroos/unsure/engine"
 	ec "github.com/corverroos/unsure/engine/client"
-	"github.com/uht-hack/unsure/client"
-
 	uht "github.com/uht-hack/unsure"
+	"github.com/uht-hack/unsure/client"
+	"github.com/uht-hack/unsure/db"
 )
 
 var addr1 = flag.String("uht_cl1", "", "host:port of UHT 1 gRPC service")
@@ -16,6 +16,7 @@ var addr3 = flag.String("uht_cl3", "", "host:port of UHT 3 gRPC service")
 type State struct {
 	engineClient engine.Client
 	uhtClient []uht.UhtClient
+	uhtDB *db.UhtDB
 }
 
 func (s *State) EngineClient() engine.Client {
@@ -26,6 +27,10 @@ func (s *State) UhtClient(num int) uht.UhtClient {
 	return s.uhtClient[num]
 }
 
+func (s *State) UhtDB() *db.UhtDB {
+	return s.uhtDB
+}
+
 // New returns a new engine state.
 func New() (*State, error) {
 	var (
@@ -34,6 +39,11 @@ func New() (*State, error) {
 	)
 
 	s.engineClient, err = ec.New()
+	if err != nil {
+		return nil, err
+	}
+
+	s.uhtDB, err = db.Connect()
 	if err != nil {
 		return nil, err
 	}
