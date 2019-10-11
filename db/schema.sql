@@ -5,16 +5,6 @@ create table `matches`
   players int
 );
 
-create table `match_events`
-(
-    id bigint not null auto_increment,
-    foreign_id bigint not null,
-    timestamp datetime not null,
-    type int not null,
-
-    primary key (id)
-);
-
 create table `rounds`
 (
   id bigint not null auto_increment,
@@ -32,7 +22,7 @@ create table `rounds`
   unique by_team_status (team,`index`)
 );
 
-create table `round_events`
+create table `events`
 (
   id bigint not null auto_increment,
   foreign_id bigint not null,
