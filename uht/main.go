@@ -2,20 +2,20 @@ package main
 
 import (
 	"github.com/corverroos/unsure"
-	loser_ops "github.com/corverroos/unsure/loser/ops"
-	"github.com/corverroos/unsure/loser/state"
 	"github.com/luno/jettison/errors"
+
+	"github.com/uht-hack/unsure/state"
 )
 
 func main() {
 	unsure.Bootstrap()
 
-	s, err := state.New()
+	_, err := state.New()
 	if err != nil {
 		unsure.Fatal(errors.Wrap(err, "new state error"))
 	}
 
-	loser_ops.StartLoops(s)
+	//loser_ops.StartLoops(s)
 
 	unsure.WaitForShutdown()
 }
