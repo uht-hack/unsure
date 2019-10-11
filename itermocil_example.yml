@@ -5,3 +5,11 @@ windows:
     panes:
       - commands:
          - go run unsure/engine/engine/main.go --db_recreate --crash_ttl=0 --fate_p=0
+      - commands:
+         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_1?"
+      - commands:
+         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_2?"
+      - commands:
+         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_3?"
+      - commands:
+         - go run uht-unsure/uht/main.go --db_recreate --uht_db="mysql://root@tcp(127.0.0.1:3306)/uht_4?"
