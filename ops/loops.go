@@ -17,7 +17,7 @@ import (
 
 var (
 	team    = flag.String("team", "losers", "team name")
-	player  = flag.String("player", "loser", "player name")
+	player  = flag.String("player", "", "player name")
 	players = flag.Int("players", 4, "number of players in the team")
 )
 
@@ -53,9 +53,14 @@ func logHeadForever(s *state.State) {
 }
 
 func startMatchForever(s *state.State) {
+	if *player != "1" {
+		return
+	}
+
 	for {
 		ctx := unsure.ContextWithFate(context.Background(), unsure.DefaultFateP())
 
+		log.Info(ctx, "Starting match")
 		err := s.EngineClient().StartMatch(ctx, *team, *players)
 
 		if errors.Is(err, engine.ErrActiveMatch) {

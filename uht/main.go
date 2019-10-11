@@ -7,6 +7,7 @@ import (
 
 	"github.com/uht-hack/unsure/state"
 	"github.com/uht-hack/unsure/server"
+	"github.com/uht-hack/unsure/ops"
 )
 
 var grpcAddress = flag.String("grpc_address", "localhost:8000", "engine grpc server address")
@@ -20,9 +21,9 @@ func main() {
 		unsure.Fatal(errors.Wrap(err, "new state error"))
 	}
 
-	//loser_ops.StartLoops(s)
-
 	go serveGRPCForever(s)
+
+	ops.StartLoops(s)
 
 	unsure.WaitForShutdown()
 }
