@@ -23,7 +23,7 @@ var (
 
 func StartLoops(s *state.State) {
 	go startMatchForever(s)
-	go logHeadForever(s)
+	//go logHeadForever(s)
 	go consumeEngineEventsForever(s)
 	ConsumeAllPlayersForever(s)
 }
