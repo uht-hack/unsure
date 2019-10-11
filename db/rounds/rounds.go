@@ -3,7 +3,9 @@ package rounds
 import (
 	"database/sql"
 	"database/sql/driver"
+	"context"
 	"encoding/json"
+	"github.com/luno/shift"
 	"sort"
 	"time"
 
@@ -13,7 +15,7 @@ import (
 type Round struct {
 	ID        int64       `protocp:"1"`
 	MatchID   int64       `protocp:"2"`
-	Index     int64       `protocp:"3"`
+	Index     int64       `protocp:"3"` // this is the payer id
 	Team      string      `protocp:"4"`
 	Status    RoundStatus `protocp:"5"`
 	State     RoundState  `protocp:"6"`
@@ -113,4 +115,59 @@ func (rs RoundState) GetTotal(player string) int {
 		res += m.Parts[player]
 	}
 	return res
+}
+
+func LookupByIndex(ctx context.Context, dbc *sql.DB,index int) (*Round, error) {
+	return lookupWhere(ctx,dbc,"index=?", index)
+}
+
+func Join(ctx context.Context, dbc *sql.DB, team string, matchID int64, index int) error {
+	_, err := fsm.Insert(ctx, dbc, joinReq{Team: team, MatchID: matchID, Index: index})
+	return err
+}
+
+func ToJoined(ctx context.Context, dbc *sql.DB, id int64, from RoundStatus,
+	prevUpdatedAt time.Time, newState RoundState) error {
+
+	return to(ctx, dbc, id, from, RoundStatusJoined, prevUpdatedAt,
+		joinedReq{ID: id, State: newState})
+}
+
+func ensurePrevUpdatedAt(ctx context.Context, tx *sql.Tx, id int64, updatedAt time.Time) error {
+	var n int
+	err := tx.QueryRowContext(ctx, "select exists (select 1 from rounds "+
+		"where id=? and updated_at=?)", id, updatedAt).Scan(&n)
+	if err != nil {
+		return err
+	}
+
+	if n != 1 {
+		return engine.ErrConcurrentUpdates
+	}
+
+	return nil
+}
+
+
+func to(ctx context.Context, dbc *sql.DB, id int64, from, to RoundStatus,
+	prevUpdatedAt time.Time, req shift.Updater) error {
+
+	tx, err := dbc.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	err = ensurePrevUpdatedAt(ctx, tx, id, prevUpdatedAt)
+	if err != nil {
+		return err
+	}
+
+	notify, err := fsm.UpdateTx(ctx, tx, from, to, req)
+	if err != nil {
+		return err
+	}
+	defer notify()
+
+	return tx.Commit()
 }

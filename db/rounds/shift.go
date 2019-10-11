@@ -32,7 +32,7 @@ type joinReq struct {
 
 type joinedReq struct {
 	ID    int64
-	State RoundStatus
+	State RoundState
 }
 
 type collectReq struct {

@@ -24,6 +24,8 @@ var (
 func StartLoops(s *state.State) {
 	go startMatchForever(s)
 	go logHeadForever(s)
+	go consumeEngineEventsForever(s)
+	ConsumeAllPlayersForever(s)
 }
 
 func logHeadForever(s *state.State) {
