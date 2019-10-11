@@ -60,6 +60,7 @@ func CollectRound(ctx context.Context, s *state.State, roundID string) error {
 		return err
 	}
 
+	return nil
 }
 
 // JoinRound tells the player to join the specified round.
