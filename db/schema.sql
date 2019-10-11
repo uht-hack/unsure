@@ -1,4 +1,4 @@
-create table `match`
+create table `matches`
 (
   id bigint primary key,
   status int
@@ -14,7 +14,7 @@ create table `match_events`
     primary key (id)
 );
 
-create table `round`
+create table `rounds`
 (
   id bigint primary key,
   status int,
