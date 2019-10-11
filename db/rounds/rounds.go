@@ -93,6 +93,18 @@ func (rs RoundState) GetPlayer(player string) (int, RoundPlayerState, bool) {
 	return 0, RoundPlayerState{}, false
 }
 
+func (rs RoundState) Included(player string)  bool {
+	for _, p := range rs.Players {
+		if p.Name != player {
+			continue
+		}
+
+		return p.Included
+	}
+
+	return false
+}
+
 func (rs RoundState) GetSubmitOrder() []RoundPlayerState {
 	var res []RoundPlayerState
 	for _, m := range rs.Players {
@@ -109,8 +121,8 @@ func (rs RoundState) GetSubmitOrder() []RoundPlayerState {
 	return res
 }
 
-func (rs RoundState) GetTotal(player string) int {
-	var res int
+func (rs RoundState) GetTotal(player string) int32 {
+	var res int32
 	for _, m := range rs.Players {
 		res += m.Parts[player]
 	}
@@ -130,6 +142,20 @@ func ToJoined(ctx context.Context, dbc *sql.DB, id int64, from RoundStatus,
 	prevUpdatedAt time.Time, newState RoundState) error {
 
 	return to(ctx, dbc, id, from, RoundStatusJoined, prevUpdatedAt,
+		joinedReq{ID: id, State: newState})
+}
+
+func ToCollect(ctx context.Context, dbc *sql.DB, id int64, from RoundStatus,
+	prevUpdatedAt time.Time, newState RoundState) error {
+
+	return to(ctx, dbc, id, from, RoundStatusCollect, prevUpdatedAt,
+		joinedReq{ID: id, State: newState})
+}
+
+func ToCollected(ctx context.Context, dbc *sql.DB, id int64, from RoundStatus,
+	prevUpdatedAt time.Time, newState RoundState) error {
+
+	return to(ctx, dbc, id, from, RoundStatusCollected, prevUpdatedAt,
 		joinedReq{ID: id, State: newState})
 }
 
