@@ -1,8 +1,11 @@
 package client
 
 import (
+	"context"
 	"github.com/corverroos/unsure"
 	pb "github.com/corverroos/unsure/engine/enginepb"
+	"github.com/luno/reflex"
+	"github.com/luno/reflex/reflexpb"
 	"google.golang.org/grpc"
 
 	uht "github.com/uht-hack/unsure"
@@ -14,6 +17,19 @@ type client struct {
 	address   string
 	rpcConn   *grpc.ClientConn
 	rpcClient pb.EngineClient
+}
+
+func (c *client) Ping(ctx context.Context) error {
+	_, err := c.rpcClient.Ping(ctx, &pb.Empty{})
+	return err
+}
+
+func (c *client) Stream(ctx context.Context, after string, opts ...reflex.StreamOption) (reflex.StreamClient, error) {
+	sFn := reflex.WrapStreamPB(func(ctx context.Context,
+		req *reflexpb.StreamRequest) (reflex.StreamClientPB, error) {
+		return c.rpcClient.Stream(ctx, req)
+	})
+	return sFn(ctx, after, opts...)
 }
 
 type option func(*client)

@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	dbURI = flag.String("uht_db", "",
+	dbURI = flag.String("uht_db", "mysql://root@unix("+unsure.SockFile()+")/uht_1?",
 		"uht client DB URI")
 )
 
