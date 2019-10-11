@@ -2,11 +2,40 @@ package ops
 
 import (
 	"context"
+	"database/sql"
 	"strconv"
 
 	"github.com/uht-hack/unsure/db/rounds"
 	"github.com/uht-hack/unsure/state"
 )
+
+func AttemptSubmit(ctx context.Context, dbc *sql.DB, roundID string) error {
+	rID, err := strconv.Atoi(roundID)
+	if err != nil {
+		return err
+	}
+
+	r, err := rounds.LookupByIndex(ctx, dbc, rID)
+	if err != nil {
+		return err
+	}
+
+	// Check if the player is included or if they haven't submitted in the round
+	if !r.State.Included(*player) || r.State.Submitted(*player) {
+		return nil
+	}
+
+	if !r.State.CanSubmit(*player) {
+		return nil
+	}
+
+	// Perform the submit
+
+
+	// Move to correct status
+
+	return nil
+}
 
 func CollectRound(ctx context.Context, s *state.State, roundID string) error {
 	rID, err := strconv.Atoi(roundID)

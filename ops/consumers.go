@@ -48,7 +48,7 @@ type consumerName = reflex.ConsumerName
 const playerEventsConsumer consumerName = "consume_player_update"
 
 func ConsumeAllPlayersForever(s *state.State) {
-	for i := 0 ;i < 3 ;i ++  {
+	for i := 0; i < 3; i++ {
 		go ConsumePlayerEvents(s.UhtDB().DB,s.UhtClient(i).Stream, false)
 	}
 
@@ -57,20 +57,17 @@ func ConsumeAllPlayersForever(s *state.State) {
 }
 
 func ConsumePlayerEvents(dbc *sql.DB, stream reflex.StreamFunc, isOwnEvents bool) {
-
-
-
 	f := func(ctx context.Context, fate fate.Fate, e *reflex.Event) error {
-
-
 		if reflex.IsAnyType(e.Type, rounds.RoundStatusCollected) {
-
 			// Do lookup for players' data
+		}
 
+		if reflex.IsAnyType(e.Type, rounds.RoundStatusSubmit) {
+			// Try submit
+			return AttemptSubmit(ctx, dbc, e.ForeignID)
 		}
 
 		return nil
-
 	}
 
 	cursorStore := cursors.ToStore(dbc)
