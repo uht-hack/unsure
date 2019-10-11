@@ -2,6 +2,7 @@ package ops
 
 import (
 	"context"
+	"errors"
 	"github.com/uht-hack/unsure/db/rounds"
 	"github.com/uht-hack/unsure/state"
 	"strconv"
@@ -28,9 +29,13 @@ func JoinRound(ctx context.Context, s *state.State, roundID string) error {
 
 	// Ask the engine client to join the round
 	cl := s.EngineClient()
-	err = cl.JoinRound(ctx,"uht", player, int64(rID))
+	ok, err := cl.JoinRound(ctx,"uht", *player, int64(rID))
 	if err != nil {
 		return err
+	}
+
+	if !ok {
+		return errors.New("can't join")
 	}
 
 	// Move the round into joined state

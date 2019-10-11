@@ -2,13 +2,14 @@ package ops
 
 import (
 	"context"
-	"time"
-
-	"github.com/uht-hack/unsure/db/cursors"
+	"database/sql"
 	"github.com/corverroos/unsure/engine"
 	"github.com/luno/fate"
 	"github.com/luno/reflex"
 	"github.com/luno/reflex/rpatterns"
+	"github.com/uht-hack/unsure/db/cursors"
+	"github.com/uht-hack/unsure/db/events"
+	"github.com/uht-hack/unsure/db/rounds"
 	"github.com/uht-hack/unsure/state"
 )
 
@@ -36,4 +37,40 @@ func consumeEngineEventsForever(s *state.State) {
 	consumer := reflex.NewConsumer(engineEventsConsumer, f, reflex.WithConsumerActivityTTL(-1))
 
 	rpatterns.ConsumeForever(GetCTX, consumable.Consume, consumer)
+}
+
+type consumerName = reflex.ConsumerName
+const playerEventsConsumer consumerName = "consume_player_update"
+
+func ConsumeAllPlayersForever(s *state.State) {
+	for i := 0 ;i < 3 ;i ++  {
+		go ConsumePlayerEvents(s.UhtDB().DB,s.UhtClient(i).Stream, false)
+	}
+
+	// Consume Own Events
+	go ConsumePlayerEvents(s.UhtDB().DB, events.ToStream(s.UhtDB().DB), true)
+}
+
+func ConsumePlayerEvents(dbc *sql.DB, stream reflex.StreamFunc, isOwnEvents bool) {
+
+
+
+	f := func(ctx context.Context, fate fate.Fate, e *reflex.Event) error {
+
+
+		if reflex.IsAnyType(e.Type, rounds.RoundStatusCollected) {
+
+			// Do lookup for players' data
+
+		}
+
+		return nil
+
+	}
+
+	cursorStore := cursors.ToStore(dbc)
+	c := reflex.NewConsumer(playerEventsConsumer, f)
+	consumable := reflex.NewConsumable(stream, cursorStore)
+	rpatterns.ConsumeForever(context.Background, consumable.Consume, c)
+
 }
