@@ -1,7 +1,7 @@
 create table `matches`
 (
-  id bigint primary key,
-  status int
+  id bigint primary key not null auto_increment,
+  status int,
   players int
 );
 
