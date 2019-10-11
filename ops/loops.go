@@ -19,6 +19,7 @@ var (
 	team    = flag.String("team", "losers", "team name")
 	player  = flag.String("player", "loser", "player name")
 	players = flag.Int("players", 4, "number of players in the team")
+	isPrimary = flag.Bool("is_primary", false, "indicates the primary instance")
 )
 
 func StartLoops(s *state.State) {
@@ -52,9 +53,14 @@ func logHeadForever(s *state.State) {
 }
 
 func startMatchForever(s *state.State) {
+	if !*isPrimary {
+		return
+	}
+
 	for {
 		ctx := unsure.ContextWithFate(context.Background(), unsure.DefaultFateP())
 
+		log.Info(ctx, "Starting match")
 		err := s.EngineClient().StartMatch(ctx, *team, *players)
 
 		if errors.Is(err, engine.ErrActiveMatch) {
