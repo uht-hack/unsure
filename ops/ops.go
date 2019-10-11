@@ -92,7 +92,6 @@ func JoinRound(ctx context.Context, s *state.State, roundID string) error {
 	roundState := make([]rounds.RoundPlayerState, 4)
 	roundState = append(roundState, rounds.RoundPlayerState{
 		Name:      *player,
-		Rank:      playerState.Rank,
 		Parts:     nil,
 		Included:  included,
 		Collected: false,
