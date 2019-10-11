@@ -1,0 +1,7 @@
+windows:
+  - name: Main applications
+    root: ~/Work
+    layout: 3_columns
+    panes:
+      - commands:
+         - go run unsure/engine/engine/main.go --db_recreate --crash_ttl=0 --fate_p=0
