@@ -1,4 +1,4 @@
-package uht_unsure
+package unsure
 
 type UhtClient interface {
 
