@@ -17,9 +17,8 @@ import (
 
 var (
 	team    = flag.String("team", "losers", "team name")
-	player  = flag.String("player", "loser", "player name")
+	player  = flag.String("player", "", "player name")
 	players = flag.Int("players", 4, "number of players in the team")
-	isPrimary = flag.Bool("is_primary", false, "indicates the primary instance")
 )
 
 func StartLoops(s *state.State) {
@@ -53,7 +52,7 @@ func logHeadForever(s *state.State) {
 }
 
 func startMatchForever(s *state.State) {
-	if !*isPrimary {
+	if *player != "1" {
 		return
 	}
 
