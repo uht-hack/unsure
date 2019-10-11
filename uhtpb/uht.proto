@@ -4,6 +4,12 @@ package uhtpb;
 import "google/protobuf/timestamp.proto";
 import "github.com/luno/reflex/reflexpb/reflex.proto";
 
+service Uht {
+  rpc Ping (Empty) returns (Empty) {}
+  rpc Stream (reflexpb.StreamRequest) returns (stream reflexpb.Event) {}
+}
+
+message Empty {}
 
 enum RoundStatus {
     ROUND_STATUS_UNKNOWN    = 0;
